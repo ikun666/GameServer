@@ -1,0 +1,8 @@
+{
+    "ip":"127.0.0.1",
+    "port":8080,
+    "serverName":"ikun666",
+    "version":"v10",
+    "maxConn":100,
+    "maxPackageSize":2048
+}

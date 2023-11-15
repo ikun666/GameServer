@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ikun666/v3/iface"
+	"github.com/ikun666/v4/conf"
+	"github.com/ikun666/v4/iface"
 )
 
 type Server struct {
@@ -73,12 +74,12 @@ func (s *Server) Stop() {
 func (s *Server) AddRouter(router iface.IRouter) {
 	s.Router = router
 }
-func NewServer(name string) iface.IServer {
+func NewServer() iface.IServer {
 	return &Server{
-		Name:      name,
+		Name:      conf.GConfig.ServerName,
 		IPVersion: "tcp",
-		IP:        "127.0.0.1",
-		Port:      8080,
+		IP:        conf.GConfig.IP,
+		Port:      conf.GConfig.Port,
 		Router:    nil,
 	}
 }
