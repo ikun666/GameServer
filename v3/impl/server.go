@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ikun666/v2/iface"
+	"github.com/ikun666/v3/iface"
 )
 
 type Server struct {
@@ -12,6 +12,7 @@ type Server struct {
 	IPVersion string
 	IP        string
 	Port      int
+	Router    iface.IRouter
 }
 
 func (s *Server) Serve() {
@@ -60,7 +61,7 @@ func (s *Server) Start() {
 		// }(conn)
 
 		//v2
-		dealConn := NewConnetion(conn, id, Echo)
+		dealConn := NewConnetion(conn, id, s.Router)
 		id++
 		go dealConn.Start()
 
@@ -69,21 +70,25 @@ func (s *Server) Start() {
 func (s *Server) Stop() {
 	fmt.Println("stop server")
 }
+func (s *Server) AddRouter(router iface.IRouter) {
+	s.Router = router
+}
 func NewServer(name string) iface.IServer {
 	return &Server{
 		Name:      name,
 		IPVersion: "tcp",
 		IP:        "127.0.0.1",
 		Port:      8080,
+		Router:    nil,
 	}
 }
 
-// 自定义回调函数
-func Echo(conn *net.TCPConn, buf []byte, n int) error {
-	_, err := conn.Write(buf[:n])
-	if err != nil {
-		fmt.Printf("echo err:%v", err)
-		return fmt.Errorf("echo err:%v", err)
-	}
-	return nil
-}
+// // 自定义回调函数
+// func Echo(conn *net.TCPConn, buf []byte, n int) error {
+// 	_, err := conn.Write(buf[:n])
+// 	if err != nil {
+// 		fmt.Printf("echo err:%v", err)
+// 		return fmt.Errorf("echo err:%v", err)
+// 	}
+// 	return nil
+// }

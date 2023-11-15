@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ikun666/v1/iface"
+	"github.com/ikun666/old/v1/iface"
 )
 
 type Server struct {

@@ -4,24 +4,24 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ikun666/v2/iface"
+	"github.com/ikun666/v3/iface"
 )
 
 type Connection struct {
 	Conn     *net.TCPConn
 	ID       uint32
 	IsClosed bool
-	API      iface.HandleFunc
 	ExitChan chan struct{}
+	Router   iface.IRouter
 }
 
-func NewConnetion(conn *net.TCPConn, id uint32, api iface.HandleFunc) iface.IConnection {
+func NewConnetion(conn *net.TCPConn, id uint32, router iface.IRouter) iface.IConnection {
 	return &Connection{
 		Conn:     conn,
 		ID:       id,
 		IsClosed: false,
-		API:      api,
 		ExitChan: make(chan struct{}),
+		Router:   router,
 	}
 }
 func (c *Connection) Read() {
@@ -33,11 +33,15 @@ func (c *Connection) Read() {
 			fmt.Printf("read err:%v", err)
 			return
 		}
-		err = c.API(c.Conn, buf, n)
-		if err != nil {
-			fmt.Printf("api err:%v", err)
-			return
+		req := &Request{
+			conn: c,
+			data: buf[:n],
 		}
+		go func(req iface.IRequest) {
+			c.Router.PreHandle(req)
+			c.Router.Handle(req)
+			c.Router.PostHandle(req)
+		}(req)
 	}
 }
 func (c *Connection) Start() {
