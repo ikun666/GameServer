@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ikun666/v4/iface"
+	"github.com/ikun666/old/v4/iface"
 )
 
 type Connection struct {

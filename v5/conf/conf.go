@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ikun666/v4/iface"
+	"github.com/ikun666/v5/iface"
 )
 
 type GlobalConfig struct {
-	Server     iface.IServer
-	IP         string `json:"ip"`
-	Port       int    `json:"port"`
-	ServerName string `json:"serverName"`
+	Server     iface.IServer `json:"server,omitempty"`
+	IP         string        `json:"ip,omitempty"`
+	Port       int           `json:"port,omitempty"`
+	ServerName string        `json:"server_name,omitempty"`
 
-	Version        string `json:"version"`
-	MaxConn        int    `json:"maxConn"`
-	MaxPackageSize int    `json:"maxPackageSize"`
+	Version        string `json:"version,omitempty"`
+	MaxConn        int    `json:"max_conn,omitempty"`
+	MaxPackageSize int    `json:"max_package_size,omitempty"`
 }
 
 var GConfig *GlobalConfig //全局配置
