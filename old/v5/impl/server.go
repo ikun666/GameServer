@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ikun666/v5/conf"
-	"github.com/ikun666/v5/iface"
+	"github.com/ikun666/old/v5/conf"
+	"github.com/ikun666/old/v5/iface"
 )
 
 type Server struct {

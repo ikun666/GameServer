@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"net"
+	"io"
 
-	"github.com/ikun666/v5/conf"
-	"github.com/ikun666/v5/iface"
+	"github.com/ikun666/old/v5/iface"
 )
 
 type DataPack struct {
@@ -88,21 +87,25 @@ func (d *DataPack) Pack(message iface.IMessage) ([]byte, error) {
 // 	return msg, nil
 // }
 
-func (d *DataPack) UnPack(conn net.Conn) (iface.IMessage, error) {
+func (d *DataPack) UnPack(conn io.Reader) (iface.IMessage, error) {
 	// fmt.Println("UnPack UnPack---------------")
 
 	head := make([]uint32, 2)
+	// fmt.Println("head:", head, "conn:", conn)
 	err := binary.Read(conn, binary.LittleEndian, head)
 	if err != nil {
 		fmt.Printf("read head err:%v\n", err)
 		return nil, err
 	}
-
-	if head[0] > uint32(conf.GConfig.MaxPackageSize) {
-		fmt.Printf("read len %v over MaxPackageSize %v\n", head[0], conf.GConfig.MaxPackageSize)
+	// if head[0] > uint32(conf.GConfig.MaxPackageSize) {
+	// 	fmt.Printf("read len %v over MaxPackageSize %v\n", head[0], conf.GConfig.MaxPackageSize)
+	// 	return nil, fmt.Errorf("read len over MaxPackageSize")
+	// }
+	if head[0] > 2048 {
+		fmt.Printf("read len %v over MaxPackageSize %v\n", head[0], 2048)
 		return nil, fmt.Errorf("read len over MaxPackageSize")
 	}
-
+	// fmt.Println("head:", head, "conn:", conn)
 	body := make([]byte, head[0])
 	// _, err = io.ReadFull(conn, msgData)
 	err = binary.Read(conn, binary.LittleEndian, body)

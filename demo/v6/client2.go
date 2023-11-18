@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/ikun666/v5/impl"
+	"github.com/ikun666/v6/impl"
 )
 
 func main() {

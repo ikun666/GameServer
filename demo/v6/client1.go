@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/ikun666/v5/impl"
+	"github.com/ikun666/v6/impl"
 )
 
 func main() {
@@ -43,11 +43,11 @@ func main() {
 
 		}
 	}()
-	data := "hello ikun666"
+	data := "ping test"
 	for {
 		msg := &impl.Message{
 			Len:  uint32(len(data)),
-			ID:   1,
+			ID:   0,
 			Data: []byte(data),
 		}
 		pack := impl.DataPack{}

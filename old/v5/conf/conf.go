@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ikun666/v5/iface"
+	"github.com/ikun666/old/v5/iface"
 )
 
 type GlobalConfig struct {
