@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/ikun666/old/v6/conf"
-	"github.com/ikun666/old/v6/iface"
-	"github.com/ikun666/old/v6/impl"
+	"github.com/ikun666/v7/conf"
+	"github.com/ikun666/v7/iface"
+	"github.com/ikun666/v7/impl"
 )
 
 type PingRouter struct {
@@ -29,13 +29,13 @@ type HelloRouter struct {
 }
 
 func (p *HelloRouter) Handle(req iface.IRequest) {
-	// fmt.Println("handle ping")
+	// fmt.Println("handle hello")
 	// _, err := req.GetConnetion().GetConn().Write([]byte("handle ping"))
 	req.GetConnetion().Write(1, []byte(fmt.Sprintf("hello:%v", req.GetConnetion().GetID())))
 }
 
 func main() {
-	err := conf.Init("../../v6/conf/conf.json")
+	err := conf.Init("../../v7/conf/conf.json")
 	if err != nil {
 		fmt.Printf("load conf err:%v", err)
 		return

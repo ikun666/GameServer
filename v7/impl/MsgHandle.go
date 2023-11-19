@@ -3,7 +3,7 @@ package impl
 import (
 	"fmt"
 
-	"github.com/ikun666/v6/iface"
+	"github.com/ikun666/v7/iface"
 )
 
 type MsgHandle struct {

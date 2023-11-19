@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ikun666/v6/iface"
+	"github.com/ikun666/v7/conf"
+	"github.com/ikun666/v7/iface"
 )
 
 type Connection struct {
 	Conn      net.Conn
 	ID        uint32
-	IsClosed  bool
 	ExitChan  chan struct{}
+	MsgChan   chan []byte
 	MsgHandle iface.IMsgHandle
 }
 
@@ -19,16 +20,12 @@ func NewConnetion(conn net.Conn, id uint32, msgHandle iface.IMsgHandle) iface.IC
 	return &Connection{
 		Conn:      conn,
 		ID:        id,
-		IsClosed:  false,
 		ExitChan:  make(chan struct{}),
+		MsgChan:   make(chan []byte, conf.GConfig.MaxPackageSize),
 		MsgHandle: msgHandle,
 	}
 }
 func (c *Connection) Read() (iface.IMessage, error) {
-	if c.IsClosed {
-		fmt.Printf("conn close\n")
-		return nil, fmt.Errorf("conn close")
-	}
 	pack := DataPack{}
 	// fmt.Println("unpack start")
 	msg, err := pack.UnPack(c.Conn)
@@ -42,30 +39,7 @@ func (c *Connection) Read() (iface.IMessage, error) {
 	return msg, nil
 
 }
-func (c *Connection) Write(id uint32, data []byte) error {
-	if c.IsClosed {
-		return fmt.Errorf("conn close")
-	}
-	msg := &Message{
-		Len:  uint32(len(data)),
-		ID:   id,
-		Data: data,
-	}
-	pack := DataPack{}
-	// fmt.Println("pack start")
-	sendMsg, err := pack.Pack(msg)
-	if err != nil {
-		return fmt.Errorf("pack msg err:%v", err)
-	}
-	// fmt.Println("pack end:", sendMsg)
-	_, err = c.Conn.Write(sendMsg)
-	if err != nil {
-		return fmt.Errorf("write msg err:%v", err)
-	}
-	// fmt.Println("send pack msg ok")
-	return nil
-}
-func (c *Connection) Start() {
+func (c *Connection) Reader() {
 	defer c.Stop()
 	for {
 		msg, err := c.Read()
@@ -85,23 +59,60 @@ func (c *Connection) Start() {
 		// }(req)
 		go c.MsgHandle.DoHandle(req)
 	}
+}
+func (c *Connection) Write(id uint32, data []byte) error {
+	// if c.IsClosed {
+	// 	return fmt.Errorf("conn close")
+	// }
+	msg := &Message{
+		Len:  uint32(len(data)),
+		ID:   id,
+		Data: data,
+	}
+	pack := DataPack{}
+	// fmt.Println("pack start")
+	sendMsg, err := pack.Pack(msg)
+	if err != nil {
+		return fmt.Errorf("pack msg err:%v", err)
+	}
+	// fmt.Println("pack end:", sendMsg)
+	// _, err = c.Conn.Write(sendMsg)
+	// if err != nil {
+	// 	return fmt.Errorf("write msg err:%v", err)
+	// }
+	c.MsgChan <- sendMsg
+	// fmt.Println("send pack msg ok")
+	return nil
+}
+func (c *Connection) Writer() {
+	for {
+		select {
+		case data := <-c.MsgChan:
+			_, err := c.Conn.Write(data)
+			if err != nil {
+				fmt.Println("writer err:", err)
+				return
+			}
+		case <-c.ExitChan:
+			return
+		}
+	}
 
+}
+func (c *Connection) Start() {
+	go c.Reader()
+	go c.Writer()
 }
 func (c *Connection) Stop() {
 	fmt.Printf("id=%v stop\n", c.ID)
-	if c.IsClosed {
-		return
-	}
-	c.IsClosed = true
 	c.Conn.Close()
+	c.ExitChan <- struct{}{}
 	close(c.ExitChan)
+	close(c.MsgChan)
 }
 func (c *Connection) GetConn() net.Conn {
 	return c.Conn
 }
 func (c *Connection) GetID() uint32 {
 	return c.ID
-}
-func (c *Connection) ConnIsClosed() bool {
-	return c.IsClosed
 }

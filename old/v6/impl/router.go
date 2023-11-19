@@ -1,6 +1,6 @@
 package impl
 
-import "github.com/ikun666/v6/iface"
+import "github.com/ikun666/old/v6/iface"
 
 type BaseRouter struct {
 }
