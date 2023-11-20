@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ikun666/v7/conf"
-	"github.com/ikun666/v7/iface"
+	"github.com/ikun666/v8/conf"
+	"github.com/ikun666/v8/iface"
 )
 
 type Server struct {
@@ -26,6 +26,7 @@ func (s *Server) Serve() {
 }
 func (s *Server) Start() {
 	fmt.Println("start server")
+	s.MsgHandle.StartWorkerPool()
 	addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%v:%v", s.IP, s.Port))
 	if err != nil {
 		fmt.Println(err)

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ikun666/v7/conf"
-	"github.com/ikun666/v7/iface"
+	"github.com/ikun666/v8/conf"
+	"github.com/ikun666/v8/iface"
 )
 
 type Connection struct {
@@ -57,7 +57,8 @@ func (c *Connection) Reader() {
 		// 	c.Router.Handle(req)
 		// 	c.Router.PostHandle(req)
 		// }(req)
-		go c.MsgHandle.DoHandle(req)
+		// go c.MsgHandle.DoHandle(req)
+		c.MsgHandle.Add2WorkerPool(req)
 	}
 }
 func (c *Connection) Write(id uint32, data []byte) error {

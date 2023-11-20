@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ikun666/v7/iface"
+	"github.com/ikun666/v8/iface"
 )
 
 type DataPack struct {

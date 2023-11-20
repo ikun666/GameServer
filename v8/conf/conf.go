@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ikun666/v7/iface"
+	"github.com/ikun666/v8/iface"
 )
 
 type GlobalConfig struct {
@@ -17,6 +17,8 @@ type GlobalConfig struct {
 	Version        string `json:"version,omitempty"`
 	MaxConn        int    `json:"max_conn,omitempty"`
 	MaxPackageSize int    `json:"max_package_size,omitempty"`
+	WorkerPoolSize uint32 `json:"worker_pool_size,omitempty"`
+	WorkerChanSize uint32 `json:"worker_chan_size,omitempty"`
 }
 
 var GConfig *GlobalConfig //全局配置
