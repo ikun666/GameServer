@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/ikun666/v8/conf"
-	"github.com/ikun666/v8/iface"
+	"github.com/ikun666/v9/conf"
+	"github.com/ikun666/v9/iface"
 )
 
 type MsgHandle struct {
@@ -57,6 +57,6 @@ func (m *MsgHandle) StartWorkerPool() {
 }
 func (m *MsgHandle) Add2WorkerPool(req iface.IRequest) {
 	id := rand.Intn(int(m.WorkerPoolSize))
-	fmt.Println("add req ", id)
+	// fmt.Println("add req ", id)
 	m.WorkerPool[id] <- req
 }

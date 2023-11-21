@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ikun666/v8/iface"
+	"github.com/ikun666/v9/iface"
 )
 
 type GlobalConfig struct {
+	IPVersion  string        `json:"ip_version,omitempty"`
 	Server     iface.IServer `json:"server,omitempty"`
 	IP         string        `json:"ip,omitempty"`
 	Port       int           `json:"port,omitempty"`

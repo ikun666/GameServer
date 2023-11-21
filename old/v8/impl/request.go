@@ -1,6 +1,6 @@
 package impl
 
-import "github.com/ikun666/v8/iface"
+import "github.com/ikun666/old/v8/iface"
 
 type Request struct {
 	conn iface.IConnection
