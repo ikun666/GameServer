@@ -3,7 +3,7 @@ package impl
 import (
 	"sync"
 
-	"github.com/ikun666/v9/iface"
+	"github.com/ikun666/v10/iface"
 )
 
 type ConnManager struct {

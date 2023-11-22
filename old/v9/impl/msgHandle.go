@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/ikun666/v9/conf"
-	"github.com/ikun666/v9/iface"
+	"github.com/ikun666/old/v9/conf"
+	"github.com/ikun666/old/v9/iface"
 )
 
 type MsgHandle struct {

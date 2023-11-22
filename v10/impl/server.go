@@ -5,17 +5,19 @@ import (
 	"net"
 	"time"
 
-	"github.com/ikun666/v9/conf"
-	"github.com/ikun666/v9/iface"
+	"github.com/ikun666/v10/conf"
+	"github.com/ikun666/v10/iface"
 )
 
 type Server struct {
-	Name        string
-	IPVersion   string
-	IP          string
-	Port        int
-	MsgHandle   iface.IMsgHandle
-	ConnManager iface.IConnManager
+	Name              string
+	IPVersion         string
+	IP                string
+	Port              int
+	MsgHandle         iface.IMsgHandle
+	ConnManager       iface.IConnManager
+	OnConnCreateFunc  func(iface.IConnection)
+	OnConnDestroyFunc func(iface.IConnection)
 }
 
 func (s *Server) Serve() {
@@ -55,10 +57,10 @@ func (s *Server) Start() {
 			continue
 		}
 		dealConn := NewConnetion(s, conn, id, s.MsgHandle)
-		//add in there  remove in connection.stop()
-		s.ConnManager.Add(dealConn)
+
 		id++
 		// fmt.Println("conn:", dealConn.GetConn())
+
 		go dealConn.Start()
 
 	}
@@ -96,4 +98,21 @@ func DeferCloseConn(conn net.Conn) {
 	sendMsg, _ := pack.Pack(msg)
 	conn.Write(sendMsg)
 	time.Sleep(5 * time.Second)
+}
+
+func (s *Server) SetOnConnCreate(hook func(iface.IConnection)) {
+	s.OnConnCreateFunc = hook
+}
+func (s *Server) SetOnConnDestroy(hook func(iface.IConnection)) {
+	s.OnConnDestroyFunc = hook
+}
+func (s *Server) OnConnCreate(conn iface.IConnection) {
+	if s.OnConnCreateFunc != nil {
+		s.OnConnCreateFunc(conn)
+	}
+}
+func (s *Server) OnConnDestroy(conn iface.IConnection) {
+	if s.OnConnDestroyFunc != nil {
+		s.OnConnDestroyFunc(conn)
+	}
 }

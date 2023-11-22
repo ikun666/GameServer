@@ -3,19 +3,22 @@ package impl
 import (
 	"fmt"
 	"net"
+	"sync"
 
-	"github.com/ikun666/v9/conf"
-	"github.com/ikun666/v9/iface"
+	"github.com/ikun666/v10/conf"
+	"github.com/ikun666/v10/iface"
 )
 
 type Connection struct {
-	Server    iface.IServer
-	Conn      net.Conn
-	ID        uint32
-	IsClosed  bool
-	ExitChan  chan struct{}
-	MsgChan   chan []byte
-	MsgHandle iface.IMsgHandle
+	Server       iface.IServer
+	Conn         net.Conn
+	ID           uint32
+	IsClosed     bool
+	ExitChan     chan struct{}
+	MsgChan      chan []byte
+	MsgHandle    iface.IMsgHandle
+	Property     map[string]any
+	PropertyLock sync.RWMutex
 }
 
 func NewConnetion(server iface.IServer, conn net.Conn, id uint32, msgHandle iface.IMsgHandle) iface.IConnection {
@@ -27,6 +30,7 @@ func NewConnetion(server iface.IServer, conn net.Conn, id uint32, msgHandle ifac
 		ExitChan:  make(chan struct{}),
 		MsgChan:   make(chan []byte, conf.GConfig.MaxPackageSize),
 		MsgHandle: msgHandle,
+		Property:  make(map[string]any),
 	}
 }
 func (c *Connection) Read() (iface.IMessage, error) {
@@ -106,13 +110,18 @@ func (c *Connection) Writer() {
 
 }
 func (c *Connection) Start() {
+	//add in there  remove in connection.stop()
+
 	go c.Reader()
 	go c.Writer()
+	c.Server.GetConnManager().Add(c)
+	c.Server.OnConnCreate(c)
 }
 func (c *Connection) Stop() {
 	if c.IsClosed {
 		return
 	}
+	c.Server.OnConnDestroy(c)
 	fmt.Printf("id=%v stop\n", c.ID)
 	c.IsClosed = true
 	c.Conn.Close()
@@ -126,4 +135,22 @@ func (c *Connection) GetConn() net.Conn {
 }
 func (c *Connection) GetID() uint32 {
 	return c.ID
+}
+func (c *Connection) SetProperty(key string, value any) {
+	c.PropertyLock.Lock()
+	defer c.PropertyLock.Unlock()
+	c.Property[key] = value
+}
+func (c *Connection) GetProperty(key string) (any, error) {
+	c.PropertyLock.RLock()
+	defer c.PropertyLock.RUnlock()
+	if v, ok := c.Property[key]; ok {
+		return v, nil
+	}
+	return nil, fmt.Errorf("no this %s property", key)
+}
+func (c *Connection) RemoveProperty(key string) {
+	c.PropertyLock.Lock()
+	defer c.PropertyLock.Unlock()
+	delete(c.Property, key)
 }
